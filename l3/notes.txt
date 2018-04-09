@@ -1,0 +1,89 @@
+FINIT				- initializa FPU. It sets the control and status registers to their default values
+fstcw control		- get control reg
+fstsw status		- get status reg
+
+fldl source 		- put double precision on FPU stack
+flds source			- put single precision on FPU stack
+fstl / fsts dest 	- read from top of FPU
+fstpl / fstps		- read and pop
+
+FLD1 				- Push +1.0 into the FPU stack
+FLDL2T 				- Push log(base 2) 10 onto the FPU stack
+FLDL2E 				- Push log(base 2) e onto the FPU stack
+FLDPI 				- Push the value of pi onto the FPU stack
+FLDLG2 				- Push log(base 10) 2 onto the FPU stack
+FLDLN2 				- Push log(base e) 2 onto the FPU stack
+FLDZ 				- Push +0.0 onto the FPU stack
+
+FADD 				- Floating-point addition
+FDIV 				- Floating-point division
+FDIVR 				- Reverse floating-point division
+FMUL 				- Floating-point multiplication
+FSUB 				- Floating-point subtraction
+FSUBR 				- Reverse floating-point subtraction
+
+FADD source 		- Add a 32- or 64-bit value from memory to the ST0 register
+FADD %st(x), %st(0) - Add st(x) to st(0) and store the result in st(0)
+FADD %st(0), %st(x) - Add st(0) to st(x) and store the result in st(x)
+FADDP %st(0),%st(x)	- Add st(0) to st(x) , store the result in st(x) , and pop st(0)
+FADDP 				- Add st(0) to st(1) , store the result in st(1) , and pop st(0)
+FIADD source		- Add a 16- or 32-bit integer value to st(0) and store the result in st(0)
+
+FCOM Compare the ST0 register with the ST1 register.
+FCOM ST(x) Compare the ST0 register with another FPU register.
+FCOM source Compare the ST0 register with a 32- or 64-bit memory value.
+FCOMP Compare the ST0 register with the ST1 register value and pop the
+stack.
+FCOMP ST(x) Compare the ST0 register with another FPU register value and pop
+the stack.
+FCOMP source Compare the ST0 register with a 32 or 64-bit memory value and pop
+the stack.
+FCOMPP Compare the ST0 register with the ST1 register and pop the stack
+twice.
+FTST Compare the ST0 register with the value 0.0.
+FISTS instruction retrieves the value at the top of the register stack (the value you just placed there) and places
+it into the destination (which was set to the int1 memory location):
+
+F2XM1 Computes 2 to the power of the value in ST0, minus 1
+FABS Computes the absolute value of the value in ST0
+FCHS Changes the sign of the value in ST0
+FCOS Computes the cosine of the value in ST0
+FPATAN Computes the partial arctangent of the value in ST0
+FPREM Computes the partial remainders from dividing the value in ST0 by
+the value in ST1
+FPREM1 Computes the IEEE partial remainders from dividing the value in
+ST0 by the value in ST1
+FPTAN Computes the partial tangent of the value in ST0
+FRNDINT Rounds the value in ST0 to the nearest integer
+FSCALE Computes ST0 to the ST1st power
+FSIN Computes the sine of the value in ST0
+FSINCOS Computes both the sine and cosine of the value in ST0
+FSQRT Computes the square root of the value in ST0
+FYL2X Computes the value ST1 * log ST0 (base 2 log)
+FYL2XP1 Computes the value ST1 * log (ST0 + 1) (base 2 log)
+
+# setprec.s - An example of setting the precision bits in the Control Register
+.section .data
+newvalue:
+.byte 0x7f, 0x00
+.section .bss
+.lcomm control, 2
+.section .text
+.globl _start
+_start:
+nop
+fstcw control
+fldcw newvalue		# load the newvalue value into the control register
+fstcw control
+movl $1, %eax
+movl $0, %ebx
+int $0x80
+
+00 — round to nearest
+01 — round down (toward negative infinity)
+10 — round up (toward positive infinity)
+11 — round toward zero
+
+name				base 	mant b	mant d 		exp b 	exp d		bias			e min 	e max
+Single precision	2		24		7.22		8		38.23		27−1 = 127		−126	+127	
+Double precision	2		53		15.95		11		307.95		210−1 = 1023	−1022	+1023	
