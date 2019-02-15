@@ -1,2 +1,2 @@
 # OiAK
-OiAK laboratories
+OiAK Lab
